@@ -1,0 +1,162 @@
+여러 테이블을 하나의 테이블처럼 사용하는 조인
+조인 - 테이블간의 연결 관계
+	-연결고리 (예 - 외래키...)
+
+
+1. 등가 조인(동등조건)
+컬럼의 동일 값의 조건 
+동일값에 해당하는 행만 조회
+내부 조인(INNER JOIN)
+
+2. 비등가 조인
+값이 동등하지 않아도 암묵적으로 조인
+범위 조회 - 어떤 값을 기준으로 다른 값이 그 안에 포함되면 조회(최대, 최소)
+
+3. 자체 조인
+동일 테이블간의 조인 - 테이블 내 같은 값으로 조회
+	SELF JOIN
+
+4. 외부 조인
+	왼쪽 외부 조인(LEFT OUTER JOIN)
+- 주 테이블 + 부가적인 정보
+
+	오른쪽 외부 조인(RIGHT OUTER JOIN)
+- 부가적인 정보 + 주 테이블
+동일값 기준으로 조회하되 부가적인 정보까지 추가로 표시
+
+SQL-99 표준 문법으로 배우는 조인
+1.NATURAL JOIN
+	-동등조인
+	-외래키, 기본키 - 동일 컬럼명인 경우 자동 조인
+	-실무에서, 같은 자료인데도 컬럼명이 일치하지 않는 경우가 종종 있음.
+
+SELECT E.EMPNO, E.ENAME, D.DNAME, D.LOC
+FROM EMP E NATURAL JOIN DEPT D;
+
+2.[INNER] JOIN ~ USING
+JOIN 테이블명 USING(공통 컬럼명) --값이 비슷해도 컬럼명 일치하지 않으면 사용불가
+
+3.[INNER] JOIN ~ ON
+JOIN 테이블명 ON 테이블 A.컬럼명 = 테이블B.컬럼명 - 컬럼명 달라도 값이 같으면 사용가능
+
+4.OUTER JOIN
+
+	LEFT [OUTER] JOIN 많이 사용
+
+SELECT * FROM DEPT D LEFT OUTER JOIN DEPT_SUB S ON D.DEPTNO = S.DEPTNO;
+
+	RIGHT [OUTER] JOIN
+	FULL [OUTER] JOIN
+
+
+
+
+서브쿼리
+1.서브쿼리(부속질의)
+SELECT, INSERT, UPDATE, DELETE 문 안에 SELECT문이 더 있는 형태
+
+-스칼라 부속질의
+스칼라 = 단일값
+
+1)SELECT 컬럼명
+
+2)WHERE절에서 부속질의가 비교 연산자와 사용될때
+			(<, = >)
+	참고)집합 연산자(IN, NOT IN)
+
+-인라인 뷰
+FROM에 사용되는 SELECT문
+-가상 테이블 (뷰)
+-WITH
+
+-상관부속질의
+	메인 질의문의 결과, 부속질의문의 항목을 비교...
+
+
+2. 실행 결과가 하나인 단일행 서브 쿼리
+스칼라 부속질의
+	SELECT ...
+	WHERE절 비교 연산자
+
+예) SELECT * FROM EMP
+WHERE SAL >= (SELECT SAL FROM EMP WHERE ENAME='SCOTT');
+
+(SCOTT의 SAL보다 같거나 높은 SAL을 갖고있는 항목들을 표시)
+
+SELECT * FROM EMP
+WHERE SAL < (SELECT MAX(SAL) FROM EMP WHERE DEPTNO=30);
+
+(30번 부서의 최대 급여보다 작은 급여를 받는 직원)
+
+
+다중 항목
+SELECT * FROM EMP 
+WHERE (DEPTNO, SAL) IN (SELECT DEPTNO, MAX(SAL) FROM EMP GROUP BY DEPTNO);
+(DEPTNO 중에서 가장 높은 SAL을 받는 항목을 추출)
+
+(값의 수는 같아야함.) (비교인 경우, 결과값은 1개만 나와야 함.)
+
+
+3. 실행 결과가 여러개인 다중행 서브 쿼리
+ANY, SOME -> 어떤 것이라도 참이면 반환되는 조건
+ALL -> 모든것이 참일때 반환되는 조건
+
+MIN, MAX 활용
+
+
+EXISTS 원하는 어떤 것이 있으면 참
+NOT EXISTS
+
+
+
+4.FROM절에 사용하는 서브쿼리와 WITH절
+
+가상의 테이블(뷰)
+
+SELECT * FROM (SELECT * FROM EMP WHERE DEPTNO=30) E,
+		DEPT D
+		WHERE E.DEPTNO = D.DEPTNO;
+
+(SELECT * FROM EMP WHERE DEPTNO=30) 결과 자체를 가상의 테이블 E로 설정.
+
+
+SELECT * FROM (SELECT * FROM EMP WHERE DEPTNO=30) E,
+				(SELECT D.* FROM DEPT D, DEPT_SUB S WHERE D.DEPTNO = S.DEPTNO) DD
+		WHERE E.DEPTNO = DD.DEPTNO;
+응용하면 이 구문이 가능하지만, 2번째 줄에서 어느 테이블을 참조할 것인지 명확하게 해 주지 않으면 애매함 오류 발생
+
+
+5. SELECT 절에 사용하는 서브쿼리
+
+
+스칼라 부속질의
+	단일값
+	SELECT 컬럼명 위치 부속질의
+
+	WHERE절 비교 조건(>, <, = ....)
+	참고)
+		여러 행 질의
+		ANY, SOME, ALL
+		집합 연산자 IN
+
+
+인라인뷰
+	FROM 절의 SELECT 질의문
+	-> 가상의 테이블(뷰)
+
+	WITH 별칭 AS (SELECT 절)
+	SELECT * FROM 별칭;
+
+상관부속질의
+	주 질의의 결과를 부 질의가 조건절에 사용하는 경우
+
+
+MySQL
+
+
+
+
+
+	
+
+

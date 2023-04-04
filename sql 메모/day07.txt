@@ -1,0 +1,214 @@
+*평가 전에 공부하면 좋은 것
+
+테이블명제
+사용자권한
+제약조건
+객체
+정의어
+
+1.오라클,dbeaver 설치
+
+오라클이 설치되어 있는경우 삭제를 해야 한다 - 시험
+
+삭제방법
+
+app/adminstartor/product/21c/deinstall.bat 찾아서 관리자 권한으로 실행
+
+남은 파일 지워주기
+
+프로그램 파일 들어가서 오라클 확인
+
+regedit 실행
+ 
+HKEY_LOCAL_MACHINE\SOFTWARE\ORACLE
+HKEY_LOCAL_MACHINE\SYSTEM\ORACLE
+HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services
+HKEY_LOCAL_MACHINE\SYSTEM\ControlSet002\Services
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services
+
+여기에 있는 오라클 관련 디렉토리 전부 삭제
+
+dbeaver -> 샘플 프로젝트 -> 오라클 -> password _aA123456 -> 만들어진 프로젝트 클릭 -> 다운로드
+
+비밀번호
+
+_aA123456
+
+
+
+
+SCOTT / tiger
+
+sqlplus 사용자명/비밀번호
+
+최고 관리자
+sqlplus system/_aA123456
+
+다른 계정으로 실행
+CONN 사용자명/비밀번호
+
+cmd에서 실행
+sqlplus system/_aA123456
+
+CONN SCOTT/tiger
+
+SCOTT 계정 열기
+
+ALTER USER SCOTT IDENTIFIED BY tiger ACCOUNT UNLOCK;
+
+CONN SCOTT/tiger
+
+SELECT TABLE_NAME FROM USER_TABLES;
+
+dbeaver에서
+새 데이터베이스 생성 -> 오라클
+username 이름 scott으로 수정, 비번 tiger
+
+윈도우 -> 설정 -> 색상 및 글꼴 -> 기본-> 텍스트 글꼴 편집
+
+f3 또는 sql 편집기
+
+SELECT TABLE_NAME FROM USER_TABLES;
+
+
+
+포트 = 데이터를 주고받는 통로
+오라클 = 1521
+
+유저생성
+아이디 : ORCLSTUDY
+비밀번호 : oracle
+CREATE USER ORCLSTUDY IDENTIFIED BY oracle;
+
+계정 바꾸기
+CONN ORCLSTUDY/oracle;
+
+
+
+2.설치 완료 보고서
+
+
+테이블스페이스 구분에는 dbeaver
+SELECT * FROM DBA_USERS WHERE USERNAME='ORCLSTUDY';를 입력해서
+디폴트 테이블스페이스를 입력해준다.
+
+
+3.사용자 권한, 룰 관리 - 시험
+
+CREATE 생성
+CREATE USER 사용자명 IDENTIFIED BY 비밀번호;
+
+ALTER 변경
+ALTER USER 사용자명 IDENRTIFIED BY 새로운 비밀번호;
+
+DROP 삭제
+DROP USER 사용자명; // 사용자 삭제(데이터는 삭제 안됨)
+
+DROP USER 사용자명 CASCADE; //사용자 + 스키마 객체 삭제
+
+SELECT - 조회
+
+권한 부여 - (GRANT)
+	시스템권한
+	GRANT 시스템권한,.... TO 사용자명 WITH ADMIN OPTION;
+
+	- WITH ADMIN OPTION : 가지고 있는 권한을 다른 사용자에 부여 가능
+
+
+
+	객체권한
+
+GRANT 권한부여 명령어
+GRANT CREATE SESSION TO ORCLSTUDY
+
+GRANT CREATE SESSION, CREATE USER, ALTER USER, DROP USER TO ORCLSTUDY;
+접속, 유저 생성, 수정, 삭제권한 부여
+
+GRANT CREATE SESSION, CREATE USER, ALTER USER, DROP USER TO ORCLSTUDY WITH ADMIN OPTION;
+접속, 유저 생성, 수정, 삭제권한 부여(현재 계정이 갖고 있는 권한 포함) (관리자 권한)
+
+권한 취소 - REVOKE
+
+	시스템 권한
+	REVOKE 시스템권한,....  TO 사용자;
+
+	객체 권한
+	REVOKE 객체 권한, .... ON 스키마명.객체 FROM 사용자;
+
+REVOKE CREATE SESSION, CREATE USER, ALTER USER, DROP USER FROM ORCLSTUDY;
+접속, 유저생성, 수정, 삭제권한 취소
+
+데이터 사전 테이블 - 정보
+
+ALL_USERS
+DBA_USERS
+
+DBA_OBJECS
+
+CONNECT 롤
+RESOURCE 롤 -자원 접속
+
+CREATE ROLE 롤 명칭;
+GRANT 시스템권한 TO ROLE ... [WITH ADMIN OPTION]
+
+CREATE ROLE ROLESTUDY1;
+GRANT CREATE SESSION, CREATE USER, ALTER USER, DROP USER, CREATE TABLE TO ROLESTUDY1;
+
+
+
+4.데이터를 추가, 수정, 삭제하는 방법 (수정, 삭제는 WHERE 조건식 매우중요)
+
+INSERT INTO 테이블병 (컬럼1, 컬럼2, ....) VALUES ('컬럼1 값', '컬럼2 값', ....);
+-컬럼이 테이블 전체이고 값과 동일 순서이면 (...) 생략가능
+NULL
+' '
+
+UPDATE 테이블 명
+	SET
+		컬럼1 = 컬럼1 값,
+		컬럼2 = 컬럼2 값,
+		...
+	WHERE 조건식;
+
+DELETE FROM 테이블명 WHERE 조건식;
+
+
+SELECT 컬럼명, ... FROM 테이벌명 WHERE 조건식;
+SELECT *(모든 컬럼)
+
+WHERE
+	비교연산자 >, <, >=, <=
+	=(같다)
+	!=(다르다)
+	<>(다르다)
+	^(다르다)
+
+	AND
+	OR
+	NOT
+
+DESCRIBE 테이블명;
+DESC
+
+CREATE TABLE DEPT_TEMP
+	AS SELECT * FROM DEPT;
+DEPT_TEMP에 DEPT의 전부(*) 를 복사한다.
+
+
+CREATE TABLE EMP_TEMP
+	AS SELECT * FROM EMP WHERE 1 <> 1;
+항상 거짓이므로 데이터는 조회되지 않고 구조만 복사가 된다.
+
+
+5.트랜잭션 제어와 세션
+
+6.데이터 정의어
+
+
+DROP TABLE 테이블명;
+
+SYSDATE -> DB 서버의 현재 시간
+
+COMMIT; -> 영구 반영
+
+ROLLBACK; -> 이전 시점으로 복구
